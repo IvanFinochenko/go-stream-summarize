@@ -3,15 +3,20 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"os"
 	"sort"
+	"strconv"
 	"time"
 )
 
 func main() {
 
-	N := 300
-	M := 5
-	K := 1000
+	N, errorN := strconv.Atoi(os.Getenv("GENERATE_INTERVAL"))
+	printError(errorN)
+	M, errorM := strconv.Atoi(os.Getenv("COUNT_WORKERS"))
+	printError(errorM)
+	K, errorK := strconv.Atoi(os.Getenv("PUBLISH_INTERVAL"))
+	printError(errorK)
 
 	tickerGenerator := time.NewTicker(time.Duration(N) * time.Millisecond)
 	tickerPublisher := time.NewTicker(time.Duration(K) * time.Millisecond)
@@ -26,6 +31,13 @@ func main() {
 	}
 
 	summarize(summarizeChannel, tickerPublisher.C)
+}
+
+func printError(err error) {
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }
 
 func generator(tickerGenerate <-chan time.Time, batchChannel chan<- []int) {
